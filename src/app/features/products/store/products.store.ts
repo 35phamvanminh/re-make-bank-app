@@ -7,8 +7,8 @@ import {
 } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Product } from './products.model';
-import { ProductsService } from './products.service';
+import { Product } from '../models';
+import { ProductsService } from '../services';
 
 interface ProductsState {
   products: Product[];

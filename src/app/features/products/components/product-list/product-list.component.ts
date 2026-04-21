@@ -1,11 +1,11 @@
 import { Component, inject, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CreateProductPayload, Product } from './products.model';
-import { ProductsStore } from './products.store';
-import { ToastService } from './toast.service';
-import { ProductFormComponent } from './product-form.component';
-import { LoadingComponent } from './loading.component';
+import { Product, CreateProductPayload } from '../../models';
+import { ProductsStore } from '../../store';
+import { ToastService } from '../../../../shared/services';
+import { ProductFormComponent } from '../product-form/product-form.component';
+import { LoadingComponent } from '../../../../shared/components';
 
 @Component({
   selector: 'app-product-list',

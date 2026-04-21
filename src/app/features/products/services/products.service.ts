@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { delay, of } from 'rxjs';
-import { CreateProductPayload, Product, UpdateProductPayload } from './products.model';
+import { CreateProductPayload, Product, UpdateProductPayload } from '../models';
 
 @Injectable({
   providedIn: 'root',
