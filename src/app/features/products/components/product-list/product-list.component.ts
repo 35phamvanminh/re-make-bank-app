@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LoadingComponent } from '../../../../shared/components';
-import { ToastService } from '../../../../shared/services';
+import { ToastService, BreadcrumbService } from '../../../../shared/services';
 import { CreateProductPayload, Product } from '../../models';
 import { ProductsStore } from '../../store';
 import { ProductFormComponent } from '../product-form/product-form.component';
@@ -16,6 +16,7 @@ import { ProductFormComponent } from '../product-form/product-form.component';
 export class ProductListComponent implements OnInit {
   store = inject(ProductsStore);
   toast = inject(ToastService);
+  breadcrumbService = inject(BreadcrumbService);
 
   showForm = signal(false);
   isEditing = signal(false);
@@ -24,6 +25,11 @@ export class ProductListComponent implements OnInit {
   Math = Math;
 
   ngOnInit(): void {
+    // Set breadcrumb
+    this.breadcrumbService.setBreadcrumbs([
+      { label: 'Products', url: '/products' },
+    ]);
+
     this.store.loadProducts().subscribe({
       next: () => {
         this.toast.success('Products loaded successfully!');

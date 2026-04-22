@@ -1,3 +1,4 @@
+import { computed, inject } from '@angular/core';
 import {
   patchState,
   signalStore,
@@ -5,10 +6,8 @@ import {
   withMethods,
   withState,
 } from '@ngrx/signals';
-import { computed, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { tap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
 import { Product } from '../models';
 import { ProductsService } from '../services';
 
@@ -44,7 +43,6 @@ export const ProductsStore = signalStore(
       patchState(store, { loading: true, error: null });
       return service.getProducts().pipe(
         tap((products) => {
-          console.log(products)
           patchState(store, { products });
         }),
         catchError((error: any) => {
@@ -121,7 +119,7 @@ export const ProductsStore = signalStore(
       );
     },
 
-    setSearchTerm(term: string) {
+     setSearchTerm(term: string) {
       patchState(store, { searchTerm: term });
     },
 
