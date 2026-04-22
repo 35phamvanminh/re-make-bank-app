@@ -35,7 +35,7 @@ export const ProductsStore = signalStore(
     filteredProducts: computed(() =>
       products()
         .filter((p) =>
-          p.name.toLowerCase().includes(searchTerm().toLowerCase())
+          p.name?.toLowerCase().includes(searchTerm().toLowerCase())
         )
     ),
   })),
@@ -44,6 +44,7 @@ export const ProductsStore = signalStore(
       patchState(store, { loading: true, error: null });
       return service.getProducts().pipe(
         tap((products) => {
+          console.log(products)
           patchState(store, { products });
         }),
         catchError((error: any) => {
@@ -55,7 +56,6 @@ export const ProductsStore = signalStore(
         finalize(() => {
           patchState(store, { loading: false });
         }),
-        takeUntilDestroyed()
       );
     },
 
@@ -76,7 +76,6 @@ export const ProductsStore = signalStore(
         finalize(() => {
           patchState(store, { loading: false });
         }),
-        takeUntilDestroyed()
       );
     },
 
@@ -99,7 +98,6 @@ export const ProductsStore = signalStore(
         finalize(() => {
           patchState(store, { loading: false });
         }),
-        takeUntilDestroyed()
       );
     },
 
@@ -120,7 +118,6 @@ export const ProductsStore = signalStore(
         finalize(() => {
           patchState(store, { loading: false });
         }),
-        takeUntilDestroyed()
       );
     },
 
