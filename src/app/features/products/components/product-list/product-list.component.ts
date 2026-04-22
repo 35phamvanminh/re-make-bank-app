@@ -1,6 +1,7 @@
 import { Component, inject, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Product, CreateProductPayload } from '../../models';
 import { ProductsStore } from '../../store';
 import { ToastService } from '../../../../shared/services';
@@ -38,12 +39,11 @@ import { LoadingComponent } from '../../../../shared/components';
 
         <!-- Error Message -->
         @if (store.error()) {
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center">
+          <div
+            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center"
+          >
             <span>{{ store.error() }}</span>
-            <button
-              (click)="store.clearError()"
-              class="text-red-700 hover:text-red-900 font-bold"
-            >
+            <button (click)="store.clearError()" class="text-red-700 hover:text-red-900 font-bold">
               ✕
             </button>
           </div>
@@ -62,11 +62,7 @@ import { LoadingComponent } from '../../../../shared/components';
             @for (product of store.filteredProducts(); track product.id) {
               <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden">
                 <!-- Image -->
-                <img
-                  [src]="product.image"
-                  [alt]="product.name"
-                  class="w-full h-48 object-cover"
-                />
+                <img [src]="product.image" [alt]="product.name" class="w-full h-48 object-cover" />
 
                 <!-- Content -->
                 <div class="p-4">
@@ -76,14 +72,18 @@ import { LoadingComponent } from '../../../../shared/components';
                   <!-- Info -->
                   <div class="flex justify-between items-center mb-4">
                     <span class="text-2xl font-bold text-blue-600">\${{ product.price }}</span>
-                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    <span
+                      class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold"
+                    >
                       {{ product.category }}
                     </span>
                   </div>
 
                   <!-- Stock -->
                   <div class="mb-4">
-                    <p class="text-sm text-gray-600">Stock: <span class="font-semibold">{{ product.stock }}</span></p>
+                    <p class="text-sm text-gray-600">
+                      Stock: <span class="font-semibold">{{ product.stock }}</span>
+                    </p>
                     <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
                       <div
                         class="bg-green-500 h-2 rounded-full"
@@ -137,11 +137,23 @@ export class ProductListComponent {
   Math = Math;
 
   constructor() {
-
-    effect(async() => {
-    await this.store.loadProducts();
-    this.toast.success('Products loaded successfully!');
-      })
+    effect(
+      () => {
+        // Load products on component init
+        this.store
+          .loadProducts()
+          .pipe(takeUntilDestroyed())
+          .subscribe({
+            next: () => {
+              this.toast.success('Products loaded successfully!');
+            },
+            error: () => {
+              this.toast.error('Failed to load products');
+            },
+          });
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   openForm() {
@@ -162,32 +174,52 @@ export class ProductListComponent {
     this.showForm.set(true);
   }
 
-  async handleSubmit(payload: CreateProductPayload) {
-    try {
-      if (this.isEditing() && this.editingProduct()) {
-        await this.store.updateProduct({
+  handleSubmit(payload: CreateProductPayload) {
+    if (this.isEditing() && this.editingProduct()) {
+      this.store
+        .updateProduct({
           id: this.editingProduct()!.id,
           ...payload,
+        })
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: () => {
+            this.toast.success('Product updated successfully!');
+            this.closeForm();
+          },
+          error: () => {
+            this.toast.error('Operation failed. Please try again.');
+          },
         });
-        this.toast.success('Product updated successfully!');
-      } else {
-        await this.store.createProduct(payload);
-        this.toast.success('Product created successfully!');
-      }
-      this.closeForm();
-    } catch (error) {
-      this.toast.error('Operation failed. Please try again.');
+    } else {
+      this.store
+        .createProduct(payload)
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: () => {
+            this.toast.success('Product created successfully!');
+            this.closeForm();
+          },
+          error: () => {
+            this.toast.error('Operation failed. Please try again.');
+          },
+        });
     }
   }
 
-  async deleteProduct(id: string) {
+  deleteProduct(id: string) {
     if (confirm('Are you sure you want to delete this product?')) {
-      try {
-        await this.store.deleteProduct(id);
-        this.toast.success('Product deleted successfully!');
-      } catch (error) {
-        this.toast.error('Failed to delete product');
-      }
+      this.store
+        .deleteProduct(id)
+        .pipe(takeUntilDestroyed())
+        .subscribe({
+          next: () => {
+            this.toast.success('Product deleted successfully!');
+          },
+          error: () => {
+            this.toast.error('Failed to delete product');
+          },
+        });
     }
   }
 }

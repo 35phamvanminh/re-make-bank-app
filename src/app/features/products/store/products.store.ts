@@ -7,6 +7,8 @@ import {
 } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { tap, catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { Product } from '../models';
 import { ProductsService } from '../services';
 
@@ -38,85 +40,88 @@ export const ProductsStore = signalStore(
     ),
   })),
   withMethods((store, service = inject(ProductsService)) => ({
-    async loadProducts() {
+    loadProducts() {
       patchState(store, { loading: true, error: null });
-      try {
-        const products = await new Promise<Product[]>((resolve) => {
-          service
-            .getProducts()
-            .pipe(takeUntilDestroyed())
-            .subscribe((data) => resolve(data));
-        });
-        patchState(store, { products });
-      } catch (error: any) {
-        patchState(store, { error: error.message || 'Failed to load products' });
-      } finally {
-        patchState(store, { loading: false });
-      }
+      return service.getProducts().pipe(
+        tap((products) => {
+          patchState(store, { products });
+        }),
+        catchError((error: any) => {
+          patchState(store, {
+            error: error.message || 'Failed to load products',
+          });
+          return of([]);
+        }),
+        finalize(() => {
+          patchState(store, { loading: false });
+        }),
+        takeUntilDestroyed()
+      );
     },
 
-    async createProduct(payload: any) {
+    createProduct(payload: any) {
       patchState(store, { loading: true, error: null });
-      try {
-        const product = await new Promise<Product>((resolve) => {
-          service
-            .createProduct(payload)
-            .pipe(takeUntilDestroyed())
-            .subscribe((data) => resolve(data));
-        });
-        patchState(store, (state) => ({
-          products: [...state.products, product],
-        }));
-        return product;
-      } catch (error: any) {
-        patchState(store, { error: error.message || 'Failed to create product' });
-        throw error;
-      } finally {
-        patchState(store, { loading: false });
-      }
+      return service.createProduct(payload).pipe(
+        tap((product) => {
+          patchState(store, (state) => ({
+            products: [...state.products, product],
+          }));
+        }),
+        catchError((error: any) => {
+          patchState(store, {
+            error: error.message || 'Failed to create product',
+          });
+          throw error;
+        }),
+        finalize(() => {
+          patchState(store, { loading: false });
+        }),
+        takeUntilDestroyed()
+      );
     },
 
-    async updateProduct(payload: any) {
+    updateProduct(payload: any) {
       patchState(store, { loading: true, error: null });
-      try {
-        const updatedProduct = await new Promise<Product>((resolve) => {
-          service
-            .updateProduct(payload)
-            .pipe(takeUntilDestroyed())
-            .subscribe((data) => resolve(data));
-        });
-        patchState(store, (state) => ({
-          products: state.products.map((p) =>
-            p.id === updatedProduct.id ? updatedProduct : p
-          ),
-        }));
-        return updatedProduct;
-      } catch (error: any) {
-        patchState(store, { error: error.message || 'Failed to update product' });
-        throw error;
-      } finally {
-        patchState(store, { loading: false });
-      }
+      return service.updateProduct(payload).pipe(
+        tap((updatedProduct) => {
+          patchState(store, (state) => ({
+            products: state.products.map((p) =>
+              p.id === updatedProduct.id ? updatedProduct : p
+            ),
+          }));
+        }),
+        catchError((error: any) => {
+          patchState(store, {
+            error: error.message || 'Failed to update product',
+          });
+          throw error;
+        }),
+        finalize(() => {
+          patchState(store, { loading: false });
+        }),
+        takeUntilDestroyed()
+      );
     },
 
-    async deleteProduct(id: string) {
+    deleteProduct(id: string) {
       patchState(store, { loading: true, error: null });
-      try {
-        await new Promise<void>((resolve) => {
-          service
-            .deleteProduct(id)
-            .pipe(takeUntilDestroyed())
-            .subscribe(() => resolve());
-        });
-        patchState(store, (state) => ({
-          products: state.products.filter((p) => p.id !== id),
-        }));
-      } catch (error: any) {
-        patchState(store, { error: error.message || 'Failed to delete product' });
-        throw error;
-      } finally {
-        patchState(store, { loading: false });
-      }
+      return service.deleteProduct(id).pipe(
+        tap(() => {
+          patchState(store, (state) => ({
+            products: state.products.filter((p) => p.id !== id),
+          }));
+        }),
+        catchError((error: any) => {
+          patchState(store, {
+            error: error.message || 'Failed to delete product',
+          });
+          throw error;
+        }),
+        finalize(() => {
+          patchState(store, { loading: false });
+        }),
+        takeUntilDestroyed()
+      );
     },
 
     setSearchTerm(term: string) {
