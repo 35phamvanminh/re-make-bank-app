@@ -56,7 +56,6 @@ import { Product } from '../../models';
 import { ProductsStore } from '../../store';
 
 // To shared services (up 4 levels, then to shared)
-import { ToastService } from '../../../../shared/services';
 
 // To shared components (up 4 levels, then to shared)
 import { LoadingComponent } from '../../../../shared/components';
@@ -120,7 +119,6 @@ src/app/features/users/
 |----------|-------------|---------|
 | App.ts | Feature root | `import { ProductListComponent } from './features/products'` |
 | Feature component | Feature root | `import { ProductsStore } from '../../store'` |
-| Feature component | Shared | `import { ToastService } from '../../../../shared/services'` |
 | Shared component | Shared services | `import { ToastService } from '../services'` |
 
 ---

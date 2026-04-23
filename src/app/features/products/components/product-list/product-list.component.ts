@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { LoadingComponent } from '../../../../shared/components';
-import { ToastService, BreadcrumbService } from '../../../../shared/services';
+import { BreadcrumbService, ToastService } from '../../../../shared/services';
 import { CreateProductPayload, Product } from '../../models';
 import { ProductsStore } from '../../store';
 import { ProductFormComponent } from '../product-form/product-form.component';
@@ -10,7 +11,7 @@ import { ProductFormComponent } from '../product-form/product-form.component';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingComponent, ProductFormComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LoadingComponent, ProductFormComponent, RouterLink],
   templateUrl: './product-list.component.html',
 })
 export class ProductListComponent implements OnInit {

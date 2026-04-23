@@ -3,12 +3,20 @@
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
           <h1 class="text-4xl font-bold text-gray-900">Product Management</h1>
-          <button
-            (click)="openForm()"
-            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
-          >
-            + Add Product
-          </button>
+          <div class="flex gap-3">
+            <a
+              routerLink="/products/categories"
+              class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition font-semibold"
+            >
+              📁 Categories
+            </a>
+            <button
+              (click)="openForm()"
+              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
+            >
+              + Add Product
+            </button>
+          </div>
         </div>
 
         <!-- Search -->
@@ -47,7 +55,7 @@
             @for (product of store.filteredProducts(); track product.id) {
               <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden">
                 <!-- Image -->
-                <img [src]="product.image" [alt]="product.name" class="w-full h-48 object-cover" />
+                <img [src]="product.image" [alt]="product.name" class="w-full h-48 object-cover cursor-pointer" [routerLink]="['/products', product.id]" />
 
                 <!-- Content -->
                 <div class="p-4">
@@ -79,11 +87,12 @@
 
                   <!-- Actions -->
                   <div class="flex gap-2">
-                    <button
-                      (click)="editProduct(product)"
-                      class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                    <a
+                      [routerLink]="['/products', product.id]"
+                      class="flex-1 text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
                     >
-                      Edit
+                      View
+                    </a>
                     </button>
                     <button
                       (click)="deleteProduct(product.id)"

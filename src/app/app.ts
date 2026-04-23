@@ -1,14 +1,14 @@
 import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { ToastComponent, BreadcrumbComponent } from './shared/components';
-import { ProductListComponent } from './features/products';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ProductListComponent, ToastComponent, BreadcrumbComponent],
+  imports: [RouterOutlet, ToastComponent, BreadcrumbComponent],
   template: `
     <app-breadcrumb></app-breadcrumb>
-    <app-product-list></app-product-list>
+    <router-outlet></router-outlet>
     <app-toast></app-toast>
   `,
   styleUrl: './app.css',
